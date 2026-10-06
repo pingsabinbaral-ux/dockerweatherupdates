@@ -1,0 +1,11 @@
+services:
+  weather:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - weather-data:/data
+    restart: unless-stopped
+
+volumes:
+  weather-data:

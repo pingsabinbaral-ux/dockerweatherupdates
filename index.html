@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Toronto Weather</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card wide">
+    <h1>Toronto Weather</h1>
+    <p id="status">Loading...</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th><th>Temp °C</th><th>Feels like</th>
+            <th>Humidity</th><th>Wind km/h</th><th>Precip mm</th><th>Sky</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    async function load() {
+      const data = await (await fetch('/api/history')).json();
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Toronto', dateStyle: 'short', timeStyle: 'medium', hour12: false
+      });
+      document.getElementById('rows').innerHTML = data.slice().reverse().map(r => `
+        <tr>
+          <td>${fmt.format(new Date(r.time))}</td>
+          <td>${r.temp}</td><td>${r.feels}</td><td>${r.humidity}%</td>
+          <td>${r.wind}</td><td>${r.precip}</td><td>${r.sky}</td>
+        </tr>`).join('');
+      document.getElementById('status').textContent =
+        data.length ? `${data.length} readings, updated every 5 minutes` : 'Waiting for first reading...';
+    }
+    load();
+    setInterval(load, 30000);
+  </script>
+</body>
+</html>
